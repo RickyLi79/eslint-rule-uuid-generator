@@ -1,6 +1,6 @@
 {
   "name": "@rickyli79/eslint-rule-uuid-generator",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
