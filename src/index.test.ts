@@ -50,8 +50,8 @@ describe("uuid-generator rule", () => {
     assert.strictEqual(plugin.rules?.["uuid-generator"], rule);
   });
 
-  it("replaces the default '\\UUID' placeholder with a fresh v7 uuid", () => {
-    const result = verify("const x = '\\UUID'");
+  it("replaces the default 'UUID#7' placeholder with a fresh v7 uuid", () => {
+    const result = verify("const x = 'UUID#7'");
     const uuid = generatedV7();
 
     assert.strictEqual(result.fixed, true);
@@ -61,14 +61,14 @@ describe("uuid-generator rule", () => {
       result.output!.includes(uuid!),
       "output should contain the generated uuid",
     );
-    assert.ok(!result.output!.includes("\\UUID"), "placeholder should be gone");
+    assert.ok(!result.output!.includes("UUID#7"), "placeholder should be gone");
     assert.match(result.output!, V7_UUID_REGEX);
   });
 
   it("preserves the original quote style", () => {
-    const single = verify("const x = '\\UUID'");
-    const double = verify('const x = "\\UUID"');
-    const template = verify("const x = `\\UUID`");
+    const single = verify("const x = 'UUID#7'");
+    const double = verify('const x = "UUID#7"');
+    const template = verify("const x = `UUID#7`");
 
     assert.ok(single.output!.startsWith("const x = '"));
     assert.ok(double.output!.startsWith('const x = "'));
@@ -76,8 +76,8 @@ describe("uuid-generator rule", () => {
   });
 
   it("generates v4 uuids when configured", () => {
-    const result = verify("const x = '\\UUID'", [
-      { placeholder: "\\UUID", version: "v4" },
+    const result = verify("const x = 'UUID#7'", [
+      { placeholder: "UUID#7", version: "v4" },
     ]);
     const uuid = mocks.v4.mock.results[0]?.value;
 
@@ -88,7 +88,7 @@ describe("uuid-generator rule", () => {
   });
 
   it("generates a distinct uuid for every occurrence", () => {
-    const result = verify("const x = ['\\UUID', '\\UUID', '\\UUID']");
+    const result = verify("const x = ['UUID#7', 'UUID#7', 'UUID#7']");
 
     assert.strictEqual(result.fixed, true);
     assert.strictEqual(mocks.v7.mock.results.length, 3);
@@ -124,8 +124,8 @@ describe("uuid-generator rule", () => {
   });
 
   it("supports multiple placeholder mappings", () => {
-    const result = verify("const a = '\\UUID'; const b = 'my-uuid'", [
-      { placeholder: "\\UUID", version: "v7" },
+    const result = verify("const a = 'UUID#7'; const b = 'my-uuid'", [
+      { placeholder: "UUID#7", version: "v7" },
       { placeholder: "my-uuid", version: "v4" },
     ]);
 
@@ -140,9 +140,9 @@ describe("uuid-generator rule", () => {
 
   it("supports many placeholders mapping to the same version (many-to-1)", () => {
     const result = verify(
-      "const a = '\\UUID'; const b = 'UUID#7'; const c = 'my-uuid'",
+      "const a = 'UUID#7'; const b = 'UUID#7'; const c = 'my-uuid'",
       [
-        { placeholder: "\\UUID", version: "v7" },
+        { placeholder: "UUID#7", version: "v7" },
         { placeholder: "UUID#7", version: "v7" },
         { placeholder: "my-uuid", version: "v4" },
       ],
@@ -158,13 +158,13 @@ describe("uuid-generator rule", () => {
     assert.ok(result.output!.includes(`'${v7a}'`));
     assert.ok(result.output!.includes(`'${v7b}'`));
     assert.ok(result.output!.includes(`'${v4}'`));
-    assert.ok(!result.output!.includes("\\UUID"));
+    assert.ok(!result.output!.includes("UUID#7"));
     assert.ok(!result.output!.includes("UUID#7"));
     assert.ok(!result.output!.includes("my-uuid"));
   });
 
   it("ignores template literals containing expressions", () => {
-    const result = verify("const x = `\\UUID${y}`");
+    const result = verify("const x = `UUID#7${y}`");
     assert.strictEqual(result.fixed, false);
     assert.strictEqual(mocks.v7.mock.results.length, 0);
   });
@@ -178,7 +178,7 @@ describe("uuid-generator rule", () => {
   it("works through the recommended flat config", () => {
     const linter = new Linter();
     const recommended = plugin.configs!.recommended as Linter.Config;
-    const result = linter.verifyAndFix("const x = '\\UUID'", {
+    const result = linter.verifyAndFix("const x = 'UUID#7'", {
       ...recommended,
       languageOptions: { ecmaVersion: "latest", sourceType: "module" },
     });
