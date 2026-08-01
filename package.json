@@ -8,7 +8,7 @@
   "repository": {
     "url": "https://github.com/RickyLi79/eslint-rule-uuid-generator.git"
   },
-  "description": "ESLint rule that replaces configurable placeholder string literals (e.g. '\\UUID') with fresh v4/v7 UUIDs via autofix.",
+  "description": "ESLint rule that replaces configurable placeholder string literals (e.g. 'UUID#7') with fresh v4/v7 UUIDs via autofix.",
   "license": "MIT",
   "author": {
     "name": "Ricky Li",
