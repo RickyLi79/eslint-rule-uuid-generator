@@ -48,8 +48,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
-    "changelog": "auto-changelog --template keepachangelog --commit-limit false --starting-version v0.1.1 -p",
-    "version": "pnpm run changelog && git add CHANGELOG.md"
+    "changelog": "auto-changelog --template keepachangelog --commit-limit false --starting-version v0.1.1 -p"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
