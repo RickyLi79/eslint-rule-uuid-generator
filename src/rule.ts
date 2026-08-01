@@ -12,7 +12,7 @@ export interface UuidGeneratorOptions {
 
 export type UuidGeneratorOptionsArray = UuidGeneratorOptions[];
 
-export const DEFAULT_PLACEHOLDER = "\\UUID";
+export const DEFAULT_PLACEHOLDER = "UUID#7";
 export const DEFAULT_VERSION: UuidVersion = "v7";
 
 interface ResolvedConfig {
