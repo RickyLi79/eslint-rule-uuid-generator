@@ -73,6 +73,21 @@ jobs:
         if: github.event.inputs.dry-run != 'true'
         run: pnpm publish --no-git-checks
 
+      # 确保版本 tag 存在并推送（不再依赖手动 --follow-tags），供 auto-changelog 和 gh release 使用
+      - name: Ensure version tag exists
+        if: github.event.inputs.dry-run != 'true'
+        run: |
+          VERSION="$(npm pkg get version | tr -d '"')"
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            echo "Tag v${VERSION} already exists."
+          else
+            echo "Creating and pushing tag v${VERSION} at $(git rev-parse --short HEAD)"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag "v${VERSION}"
+            git push origin "v${VERSION}"
+          fi
+
       # 发布成功后，由 workflow（main 侧）生成 changelog 并创建 GitHub Release（release notes）
       - name: Generate changelog & create GitHub Release
         if: github.event.inputs.dry-run != 'true'
@@ -84,7 +99,7 @@ jobs:
           if gh release create "v${VERSION}" --notes "$(cat CHANGELOG.md)"; then
             echo "GitHub Release v${VERSION} created."
           else
-            echo "::warning::GitHub Release creation failed (tag v${VERSION} may not be pushed; after 'npm version' use 'git push --follow-tags'). npm publish already succeeded."
+            echo "::warning::GitHub Release creation failed. npm publish already succeeded."
           fi
 
       # 把生成的 CHANGELOG.md 提交回 main（本地已 gitignore，用 -f 强制添加，保证 repo 上可见且新鲜）
