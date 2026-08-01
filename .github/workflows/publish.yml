@@ -13,7 +13,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 concurrency:
   group: publish-main
@@ -24,6 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # 需要完整历史 + tags，供 auto-changelog 生成 changelog
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -67,3 +70,17 @@ jobs:
       - name: Publish
         if: github.event.inputs.dry-run != 'true'
         run: pnpm publish --no-git-checks
+
+      # 发布成功后，由 workflow（main 侧）生成 changelog 并创建 GitHub Release（release notes）
+      - name: Generate changelog & create GitHub Release
+        if: github.event.inputs.dry-run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(npm pkg get version | tr -d '"')"
+          pnpm run changelog
+          if gh release create "v${VERSION}" --notes "$(cat CHANGELOG.md)"; then
+            echo "GitHub Release v${VERSION} created."
+          else
+            echo "::warning::GitHub Release creation failed (tag v${VERSION} may not be pushed; after 'npm version' use 'git push --follow-tags'). npm publish already succeeded."
+          fi

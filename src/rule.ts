@@ -42,7 +42,7 @@ export const rule: Rule.RuleModule = {
     type: "problem",
     docs: {
       description:
-        "Replace placeholder string literals (e.g. '\\UUID') with generated v4/v7 UUIDs via autofix.",
+        "Replace placeholder string literals (e.g. 'UUID#7') with generated v4/v7 UUIDs via autofix.",
       recommended: true,
     },
     fixable: "code",
