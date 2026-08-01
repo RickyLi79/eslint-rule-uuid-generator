@@ -1,0 +1,69 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 仅做发布演练（pnpm publish --dry-run），不真正发布
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: publish-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 仅 push main 时做版本门禁：本地版本必须高于 npm 最新版本，否则失败
+      - name: Check version changed (push only)
+        if: github.event_name == 'push'
+        run: |
+          LOCAL_VERSION="$(npm pkg get version | tr -d '"')"
+          PUBLISHED_VERSION="$(npm view @rickyli79/eslint-rule-uuid-generator version)"
+          echo "local version:  ${LOCAL_VERSION}"
+          echo "npm latest:     ${PUBLISHED_VERSION}"
+          if [ "${LOCAL_VERSION}" = "${PUBLISHED_VERSION}" ]; then
+            echo "::error::Local version ${LOCAL_VERSION} equals npm latest ${PUBLISHED_VERSION}. Bump the version before pushing to main."
+            exit 1
+          fi
+          echo "Version changed (${PUBLISHED_VERSION} -> ${LOCAL_VERSION}), proceeding to publish."
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish (dry-run, manual only)
+        if: github.event.inputs.dry-run == 'true'
+        run: pnpm publish --dry-run --no-git-checks
+
+      - name: Publish
+        if: github.event.inputs.dry-run != 'true'
+        run: pnpm publish --no-git-checks
