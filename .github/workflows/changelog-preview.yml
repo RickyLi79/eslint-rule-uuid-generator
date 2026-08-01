@@ -1,0 +1,42 @@
+name: Changelog Preview
+
+# main / dev 推送时独立生成 changelog 预览（artifact），不写回仓库、不冲突
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    # 跳过 bot 提交回 main 触发的冗余运行
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # 需要完整历史 + tags，供 auto-changelog 生成
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate changelog preview
+        run: pnpm run changelog:preview
+
+      - name: Upload changelog preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-${{ github.ref_name }}
+          path: CHANGELOG-preview.md
