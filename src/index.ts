@@ -1,11 +1,12 @@
 import type { ESLint } from "eslint";
 
 import { rule } from "./rule";
+import { version } from "../package.json";
 
 const plugin: ESLint.Plugin = {
   meta: {
     name: "@rickyli79/eslint-rule-uuid-generator",
-    version: "1.0.0",
+    version,
   },
   rules: {
     "uuid-generator": rule,
