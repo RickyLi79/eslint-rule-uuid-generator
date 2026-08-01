@@ -1,12 +1,19 @@
 {
   "name": "@rickyli79/eslint-rule-uuid-generator",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/RickyLi79/eslint-rule-uuid-generator.git"
+  },
   "description": "ESLint rule that replaces configurable placeholder string literals (e.g. '\\UUID') with fresh v4/v7 UUIDs via autofix.",
   "license": "MIT",
+  "author": {
+    "name": "Ricky Li",
+    "email": "382688672@qq.com"
+  },
   "keywords": [
     "eslint",
     "eslint-plugin",
