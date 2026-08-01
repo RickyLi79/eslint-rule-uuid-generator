@@ -1,6 +1,6 @@
 {
   "name": "@rickyli79/eslint-rule-uuid-generator",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
@@ -47,11 +47,16 @@
     "build": "tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "changelog": "auto-changelog --template keepachangelog --commit-limit false -p",
+    "version": "pnpm run changelog && git add CHANGELOG.md",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "auto-changelog": "^2.6.0",
     "eslint": "^9.0.0",
+    "husky": "^9.1.7",
     "rimraf": "^6.1.3",
     "tsup": "^8.5.1",
     "typescript": " ^5.9.3",
